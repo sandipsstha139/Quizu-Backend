@@ -7,15 +7,19 @@ import {
   getQuiz,
   updateQuiz,
 } from "../controllers/quiz.controller.js";
+import { restrictTo } from "../middleware/restrictTo.js";
 
 const router = express.Router();
 
-router.route("/").get(getAllQuiz).post(verifyJWT, createQuiz);
+router
+  .route("/")
+  .get(getAllQuiz)
+  .post(verifyJWT, restrictTo("admin"), createQuiz);
 
 router
   .route("/:id")
   .get(getQuiz)
-  .patch(verifyJWT, updateQuiz)
-  .delete(verifyJWT, deleteQuiz);
+  .patch(verifyJWT, restrictTo("admin"), updateQuiz)
+  .delete(verifyJWT, restrictTo("admin"), deleteQuiz);
 
 export default router;

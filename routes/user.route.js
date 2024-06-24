@@ -1,13 +1,16 @@
 import express from "express";
 import {
   changePassword,
+  forgetPassword,
   getMe,
   login,
   logout,
   refreshAccessToken,
   register,
+  resetPassword,
   updateAvatar,
   updateProfile,
+  verifyOtp,
 } from "../controllers/user.controller.js";
 import { verifyJWT } from "../middleware/auth.middleware.js";
 import { upload } from "../middleware/multer.js";
@@ -20,6 +23,10 @@ router.route("/login").post(login);
 router.route("/register").post(register);
 router.route("/logout").get(verifyJWT, logout);
 router.route("/me").get(verifyJWT, getMe);
+
+router.route("/forget-password").post(forgetPassword);
+router.route("/verify-otp").post(verifyOtp);
+router.route("/reset-password").post(verifyJWT, resetPassword);
 
 router.route("/avatar").patch(verifyJWT, upload.single("avatar"), updateAvatar);
 router.route("/change-password").patch(verifyJWT, changePassword);

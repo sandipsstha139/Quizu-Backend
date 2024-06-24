@@ -18,7 +18,6 @@ const userSchema = new Schema(
       lowercase: true,
       trim: true,
     },
-
     avatar: {
       type: String,
       default:
@@ -27,7 +26,13 @@ const userSchema = new Schema(
     phNumber: {
       type: Number,
     },
-    scores: [scoreSchema],
+    score: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Score",
+        required: true,
+      },
+    ],
     password: {
       type: String,
       required: [true, "Password is required"],
@@ -40,6 +45,10 @@ const userSchema = new Schema(
       enum: ["user", "admin"],
       default: "user",
     },
+    passwordResetOTP: {
+      type: String,
+    },
+    passwordResetExpires: String,
   },
   {
     timestamps: true,
@@ -65,6 +74,7 @@ userSchema.methods.generateAccessToken = function () {
       username: this.username,
       fullName: this.fullName,
       role: this.role,
+      score: this.score,
     },
     process.env.ACCESS_TOKEN_SECRET,
     {
@@ -72,6 +82,7 @@ userSchema.methods.generateAccessToken = function () {
     }
   );
 };
+
 userSchema.methods.generateRefreshToken = function () {
   return jwt.sign(
     {

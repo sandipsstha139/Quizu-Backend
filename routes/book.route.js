@@ -8,18 +8,29 @@ import {
   getSingleBook,
   updateBook,
 } from "../controllers/book.controller.js";
+import { restrictTo } from "../middleware/restrictTo.js";
 
 const router = express.Router();
 
 router
   .route("/")
   .get(getAllBooks)
-  .post(verifyJWT, upload.single("coverImage"), createBook);
+  .post(
+    verifyJWT,
+    restrictTo("admin"),
+    upload.single("coverImage"),
+    createBook
+  );
 
 router
   .route("/:id")
   .get(getSingleBook)
-  .patch(verifyJWT, upload.single("coverImage"), updateBook)
-  .delete(verifyJWT, deleteBook);
+  .patch(
+    verifyJWT,
+    restrictTo("admin"),
+    upload.single("coverImage"),
+    updateBook
+  )
+  .delete(verifyJWT, restrictTo("admin"), deleteBook);
 
 export default router;

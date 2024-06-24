@@ -3,6 +3,8 @@ import AppError from "../utils/AppError.js";
 import { CatchAsync } from "../utils/catchAsync.js";
 import uploadOnCloudinary from "../utils/cloudinary.js";
 import jwt from "jsonwebtoken";
+import { v4 as uuidv4 } from "uuid";
+import { sendEmail } from "../utils/sendEmail.js";
 
 const filterObj = (obj, ...allowedFields) => {
   const newObj = {};
@@ -116,6 +118,122 @@ export const register = CatchAsync(async (req, res, next) => {
   });
 });
 
+export const forgetPassword = CatchAsync(async (req, res, next) => {
+  const { email } = req.body;
+
+  // Generate a 6-digit OTP
+  const otp = uuidv4().substr(0, 6);
+
+  // Set OTP expiration time (10 minutes from now)
+  const otpExpires = Date.now() + 10 * 60 * 1000;
+
+  const user = await User.findOneAndUpdate(
+    { email },
+    { $set: { passwordResetOTP: otp, passwordResetExpires: otpExpires } },
+    { new: true, upsert: true }
+  );
+
+  if (!user) {
+    return res.status(404).json({
+      status: "error",
+      message: "Email not found.",
+    });
+  }
+
+  console.log(user);
+
+  try {
+    await sendEmail({
+      email,
+      subject: "Password Reset OTP",
+      message: `Your OTP for password reset is ${otp}. It will expire in 10 minutes.`,
+    });
+
+    res.status(200).json({
+      status: "success",
+      message: "OTP sent successfully.",
+    });
+  } catch (err) {
+    return next(
+      new AppError(
+        "There was an error sending the email. Try again later!",
+        500
+      )
+    );
+  }
+});
+
+export const verifyOtp = CatchAsync(async (req, res, next) => {
+  const { otp } = req.body;
+
+  const user = await User.findOne({ passwordResetOTP: otp });
+
+  // Verify OTP and check expiration time
+  if (!user || user.passwordResetExpires < Date.now()) {
+    return res.status(400).json({
+      status: "error",
+      message: "Invalid or expired OTP.",
+    });
+  }
+
+  await User.findOneAndUpdate(
+    { passwordResetOTP: otp },
+    { $unset: { passwordResetOTP: "", passwordResetExpires: "" } }
+  );
+
+  const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(
+    user
+  );
+
+  const options = {
+    httpOnly: true,
+    secure: true,
+    sameSite: "None",
+  };
+
+  res
+    .status(200)
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options)
+    .json({
+      status: "success",
+      message: "OTP verified successfully.",
+    });
+});
+
+export const resetPassword = async (req, res, next) => {
+  const user = await User.findById(req.user._id);
+  if (!user) {
+    return next(new AppError("Token invalid or expired!"), 400);
+  }
+  const { newPassword, confirmPassword } = req.body;
+
+  if (newPassword !== confirmPassword) {
+    return next(
+      new AppError("Password and Confiirm password donot match!"),
+      400
+    );
+  }
+
+  user.password = newPassword;
+  await user.save();
+
+  const options = {
+    httpOnly: true,
+    secure: true,
+    sameSite: "None",
+  };
+
+  res
+    .status(200)
+    .clearCookie("accessToken", options)
+    .clearCookie("refreshToken", options)
+    .json({
+      status: "success",
+      message: "Password reset successful.",
+    });
+};
+
 export const logout = CatchAsync(async (req, res, next) => {
   await User.findByIdAndUpdate(
     req.user._id,
@@ -146,9 +264,7 @@ export const logout = CatchAsync(async (req, res, next) => {
 
 export const getMe = CatchAsync(async (req, res, next) => {
   const user = await User.findById(req.user._id)
-    .populate({
-      path: "scores",
-    })
+    .populate("score")
     .select("-password -refreshToken");
 
   if (!user) {

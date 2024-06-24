@@ -1,9 +1,26 @@
+import { startSession } from "mongoose";
+import Quiz from "../models/quiz.model.js";
 import Score from "../models/score.model.js";
+import { User } from "../models/user.model.js";
 import AppError from "../utils/AppError.js";
 import { CatchAsync } from "../utils/catchAsync.js";
 
 export const createScore = CatchAsync(async (req, res, next) => {
+  const user = await User.findById(req.body.user);
+
+  if (!user) {
+    return next(new AppError("No User with that ID!", 404));
+  }
+  const quiz = await Quiz.findById(req.body.quiz);
+
+  if (!quiz) {
+    return next(new AppError("No Quiz with that ID!", 404));
+  }
+
   const score = await Score.create(req.body);
+
+  user.score.push(score._id);
+  await user.save();
 
   res.status(200).json({
     status: "Success",
