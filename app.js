@@ -19,7 +19,11 @@ app.use(express.json());
 app.use(urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: ["localhost:3000", "*", "https://quizu-backend-1.onrender.com"],
+    origin: [
+      "http://localhost:3000",
+      "*",
+      "https://quizu-backend-1.onrender.com",
+    ],
     credentials: true,
   })
 );
