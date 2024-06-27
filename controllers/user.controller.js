@@ -47,7 +47,11 @@ export const login = CatchAsync(async (req, res, next) => {
     return next(new AppError("User does not exists!", 404));
   }
 
-  const isPasswordCorrect = existingUser.isPasswordCorrect(password);
+  const isPasswordCorrect = await existingUser.isPasswordCorrect(password);
+
+  console.log(password);
+
+  console.log(isPasswordCorrect);
 
   if (!isPasswordCorrect) {
     return next(new AppError("Invalid Credentials!", 400));
