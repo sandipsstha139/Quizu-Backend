@@ -68,6 +68,8 @@ export const login = CatchAsync(async (req, res, next) => {
   const options = {
     httpOnly: true,
     secure: true,
+    overwrite: true,
+    sameSite: "none",
   };
 
   res
@@ -111,6 +113,8 @@ export const register = CatchAsync(async (req, res, next) => {
   const options = {
     httpOnly: true,
     secure: true,
+    overwrite: true,
+    sameSite: "none",
   };
 
   res.status(201).json({
@@ -192,7 +196,8 @@ export const verifyOtp = CatchAsync(async (req, res, next) => {
   const options = {
     httpOnly: true,
     secure: true,
-    sameSite: "None",
+    overwrite: true,
+    sameSite: "none",
   };
 
   res
@@ -225,7 +230,8 @@ export const resetPassword = async (req, res, next) => {
   const options = {
     httpOnly: true,
     secure: true,
-    sameSite: "None",
+    overwrite: true,
+    sameSite: "none",
   };
 
   res
@@ -254,6 +260,8 @@ export const logout = CatchAsync(async (req, res, next) => {
   const options = {
     httpOnly: true,
     secure: true,
+    overwrite: true,
+    sameSite: "none",
   };
 
   res
@@ -398,6 +406,8 @@ export const refreshAccessToken = CatchAsync(async (req, res, next) => {
     const options = {
       httpOnly: true,
       secure: true,
+      overwrite: true,
+      sameSite: "none",
     };
     const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(
       user._id
