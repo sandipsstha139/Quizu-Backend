@@ -110,6 +110,11 @@ export const register = CatchAsync(async (req, res, next) => {
   const createdUser = await User.findById(user._id).select(
     "-password -refreshToken"
   );
+
+  const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(
+    user._id
+  );
+
   const options = {
     httpOnly: true,
     secure: true,
@@ -117,13 +122,17 @@ export const register = CatchAsync(async (req, res, next) => {
     sameSite: "none",
   };
 
-  res.status(201).json({
-    status: "success",
-    message: "User Registerd Successfully",
-    data: {
-      createdUser,
-    },
-  });
+  res
+    .status(200)
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options)
+    .json({
+      status: "success",
+      message: "User Registerd Successfully",
+      data: {
+        createdUser,
+      },
+    });
 });
 
 export const forgetPassword = CatchAsync(async (req, res, next) => {
