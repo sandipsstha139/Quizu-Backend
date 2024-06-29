@@ -23,6 +23,9 @@ app.use(
       "http://localhost:3000",
       "*",
       "https://quizu-backend-1.onrender.com",
+      "https://quizzu.vercel.app",
+      "https://quizzu-git-v1main-pradeep-chhetris-projects.vercel.app",
+      "https://quizzu-7wi9i3vc3-pradeep-chhetris-projects.vercel.app",
     ],
     credentials: true,
   })

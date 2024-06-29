@@ -6,6 +6,8 @@ import jwt from "jsonwebtoken";
 import { v4 as uuidv4 } from "uuid";
 import { sendEmail } from "../utils/sendEmail.js";
 
+// ============== Filter Object for allowed fields  ================
+
 const filterObj = (obj, ...allowedFields) => {
   const newObj = {};
   Object.keys(obj).forEach((el) => {
@@ -14,6 +16,7 @@ const filterObj = (obj, ...allowedFields) => {
   return newObj;
 };
 
+// ============== Generate Access and Refresh Token  ================
 const generateAccessAndRefereshTokens = async (userId) => {
   try {
     const user = await User.findById(userId);
@@ -372,7 +375,7 @@ export const updateProfile = CatchAsync(async (req, res, next) => {
     );
   }
 
-  const filteredBody = filterObj(req.body, "fullname", "email", "phNumber");
+  const filteredBody = filterObj(req.body, "fullname", "phNumber");
 
   const updatedUser = await User.findByIdAndUpdate(req.user._id, filteredBody, {
     new: true,
