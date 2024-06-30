@@ -1,10 +1,16 @@
 import { User } from "../models/user.model.js";
 import AppError from "../utils/AppError.js";
 import { CatchAsync } from "../utils/catchAsync.js";
-import uploadOnCloudinary from "../utils/cloudinary.js";
+
 import jwt from "jsonwebtoken";
 import { v4 as uuidv4 } from "uuid";
 import { sendEmail } from "../utils/sendEmail.js";
+import {
+  deleteFromCloudinary,
+  uploadOnCloudinary,
+} from "../utils/cloudinary.js";
+
+// ============== Filter Object for allowed fields  ================
 
 const filterObj = (obj, ...allowedFields) => {
   const newObj = {};
@@ -14,6 +20,7 @@ const filterObj = (obj, ...allowedFields) => {
   return newObj;
 };
 
+// ============== Generate Access and Refresh Token  ================
 const generateAccessAndRefereshTokens = async (userId) => {
   try {
     const user = await User.findById(userId);
@@ -86,7 +93,7 @@ export const login = CatchAsync(async (req, res, next) => {
 });
 
 export const register = CatchAsync(async (req, res, next) => {
-  const { fullname, email, password } = req.body;
+  const { fullname, email, password, role } = req.body;
 
   if (
     !email ||
@@ -105,7 +112,7 @@ export const register = CatchAsync(async (req, res, next) => {
     return next(new AppError("User Already Exists!", 400));
   }
 
-  const user = await User.create({ fullname, email, password });
+  const user = await User.create({ fullname, email, password, role });
 
   const createdUser = await User.findById(user._id).select(
     "-password -refreshToken"
@@ -306,6 +313,15 @@ export const updateAvatar = CatchAsync(async (req, res, next) => {
   if (!avatarLocalPath) {
     return next(new AppError("Avatar File missing!", 404));
   }
+
+  const currentUser = await User.findById(req.user?._id);
+
+  if (currentUser.avatar) {
+    const oldAvatarPublicId = currentUser.avatar.split("/").pop().split(".")[0];
+    console.log(currentUser.avatar);
+    await deleteFromCloudinary(oldAvatarPublicId);
+  }
+
   const avatar = await uploadOnCloudinary(avatarLocalPath);
 
   if (!avatar.url) {
@@ -326,7 +342,7 @@ export const updateAvatar = CatchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: "success",
-    messsage: "Avatar updated Successfully!",
+    message: "Avatar updated Successfully!",
     data: {
       user,
     },
@@ -372,7 +388,7 @@ export const updateProfile = CatchAsync(async (req, res, next) => {
     );
   }
 
-  const filteredBody = filterObj(req.body, "fullname", "email", "phNumber");
+  const filteredBody = filterObj(req.body, "fullname", "phNumber");
 
   const updatedUser = await User.findByIdAndUpdate(req.user._id, filteredBody, {
     new: true,

@@ -7,7 +7,7 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const uploadOnCloudinary = async (localFilePath) => {
+export const uploadOnCloudinary = async (localFilePath) => {
   try {
     if (!localFilePath) return null;
 
@@ -23,4 +23,17 @@ const uploadOnCloudinary = async (localFilePath) => {
   }
 };
 
-export default uploadOnCloudinary;
+export const deleteFromCloudinary = async (publicId) => {
+  try {
+    console.log(publicId);
+    const result = await cloudinary.uploader.destroy(`quizu/${publicId}`, {
+      type: "upload",
+      resource_type: "image",
+    });
+    console.log("Deleted Successfully:", result);
+    return result;
+  } catch (error) {
+    console.error("Error while deleting old avatar:", error);
+    throw new AppError("Error while deleting old avatar!", 500);
+  }
+};

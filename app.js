@@ -9,6 +9,7 @@ import bookRoute from "./routes/book.route.js";
 import questionRoute from "./routes/question.route.js";
 import quizRoute from "./routes/quiz.route.js";
 import scoreRoute from "./routes/score.route.js";
+import categoryRoute from "./routes/category.route.js";
 import globalErrorHandler from "./controllers/error.controller.js";
 
 const app = express();
@@ -24,6 +25,9 @@ app.use(
       "192.168.1.65:3000",
       "*",
       "https://quizu-backend-1.onrender.com",
+      "https://quizzu.vercel.app",
+      "https://quizzu-git-v1main-pradeep-chhetris-projects.vercel.app",
+      "https://quizzu-7wi9i3vc3-pradeep-chhetris-projects.vercel.app",
     ],
     credentials: true,
   })
@@ -37,6 +41,7 @@ app.use("/api/v1/book", bookRoute);
 app.use("/api/v1/question", questionRoute);
 app.use("/api/v1/quiz", quizRoute);
 app.use("/api/v1/score", scoreRoute);
+app.use("/api/v1/category", categoryRoute);
 
 // Global Error Handler
 app.use(globalErrorHandler);

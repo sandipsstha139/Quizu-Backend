@@ -1,7 +1,10 @@
 import News from "../models/news.model.js";
 import AppError from "../utils/AppError.js";
 import { CatchAsync } from "../utils/catchAsync.js";
-import uploadOnCloudinary from "../utils/cloudinary.js";
+import {
+  deleteFromCloudinary,
+  uploadOnCloudinary,
+} from "../utils/cloudinary.js";
 
 export const createNews = CatchAsync(async (req, res, next) => {
   const { title, description } = req.body;
@@ -65,6 +68,21 @@ export const getSingleNews = CatchAsync(async (req, res, next) => {
 
 export const updateNews = CatchAsync(async (req, res, next) => {
   const { title, description } = req.body;
+
+  const currentNews = await News.findById(req.params.id);
+  if (!currentNews) {
+    return next(new AppError("No news found with that ID", 404));
+  }
+
+  if (currentNews.coverImage) {
+    console.log(currentNews.coverImage);
+    const oldCoverImagePublicId = currentNews.coverImage
+      .split("/")
+      .pop()
+      .split(".")[0];
+    console.log(currentNews.coverImage);
+    await deleteFromCloudinary(oldCoverImagePublicId);
+  }
 
   let coverImageUrl;
   const coverImageLocalPath = req.file?.path;
