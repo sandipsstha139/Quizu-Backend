@@ -6,6 +6,9 @@ const questionSchema = new Schema(
       type: String,
       required: true,
     },
+    coverImage: {
+      type: String,
+    },
     options: [
       {
         type: String,
@@ -14,6 +17,11 @@ const questionSchema = new Schema(
     ],
     correct_option: {
       type: String,
+      required: true,
+    },
+    quiz: {
+      type: Schema.Types.ObjectId,
+      ref: "Quiz",
       required: true,
     },
   },

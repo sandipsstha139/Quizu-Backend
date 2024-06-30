@@ -10,6 +10,10 @@ const quizSchema = new Schema(
       type: String,
     },
     category: {
+      type: Schema.Types.ObjectId,
+      ref: "Category",
+    },
+    coverImage: {
       type: String,
       required: true,
     },

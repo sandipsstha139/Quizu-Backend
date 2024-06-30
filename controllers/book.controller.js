@@ -1,7 +1,10 @@
 import Book from "../models/book.model.js";
 import AppError from "../utils/AppError.js";
 import { CatchAsync } from "../utils/catchAsync.js";
-import uploadOnCloudinary from "../utils/cloudinary.js";
+import {
+  deleteFromCloudinary,
+  uploadOnCloudinary,
+} from "../utils/cloudinary.js";
 
 export const createBook = CatchAsync(async (req, res, next) => {
   const { title, description, author, publication, edition } = req.body;
@@ -68,6 +71,20 @@ export const getSingleBook = CatchAsync(async (req, res, next) => {
 
 export const updateBook = CatchAsync(async (req, res, next) => {
   const { title, description, author, publication, edition } = req.body;
+
+  const currentBook = await Book.findById(req.params.id);
+  if (!currentBook) {
+    return next(new AppError("No Book found with that ID", 404));
+  }
+
+  if (currentBook.coverImage) {
+    const oldCoverImagePublicId = currentBook.coverImage
+      .split("/")
+      .pop()
+      .split(".")[0];
+    console.log(currentBook.coverImage);
+    await deleteFromCloudinary(oldCoverImagePublicId);
+  }
 
   let coverImageUrl;
   const coverImageLocalPath = req.file?.path;
