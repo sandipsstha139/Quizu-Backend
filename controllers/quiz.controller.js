@@ -11,7 +11,7 @@ import Category from "../models/category.model.js";
 export const createQuiz = CatchAsync(async (req, res, next) => {
   const { title, description, category, questions } = req.body;
 
-  if (!title || !description || !category || !questions) {
+  if (!title || !description || !category) {
     return next(new AppError("All fields are required!", 400));
   }
 
@@ -72,7 +72,9 @@ export const createQuiz = CatchAsync(async (req, res, next) => {
 });
 
 export const getQuiz = CatchAsync(async (req, res, next) => {
-  const quiz = await Quiz.findById(req.params.id).populate("questions");
+  const quiz = await Quiz.findById(req.params.id)
+    .populate("questions")
+    .populate("category");
 
   if (!quiz) {
     return next(new AppError("Quiz not found with that id!", 404));
@@ -101,17 +103,19 @@ export const getAllQuiz = CatchAsync(async (req, res, next) => {
 export const updateQuiz = CatchAsync(async (req, res, next) => {
   const { title, description, category, questions } = req.body;
 
-  if (!title || !description || !category || !questions) {
+  if (!title || !description || !category) {
     return next(new AppError("All fields are required!", 400));
   }
 
   // Check if questions is a valid JSON string or an array of valid ObjectId strings
   let questionsArray;
-  try {
-    questionsArray =
-      typeof questions === "string" ? JSON.parse(questions) : questions;
-  } catch (error) {
-    return next(new AppError("Invalid questions format!", 400));
+  if (questions) {
+    try {
+      questionsArray =
+        typeof questions === "string" ? JSON.parse(questions) : questions;
+    } catch (error) {
+      return next(new AppError("Invalid questions format!", 400));
+    }
   }
 
   console.log(questionsArray);
