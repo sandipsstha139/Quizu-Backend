@@ -450,3 +450,37 @@ export const refreshAccessToken = CatchAsync(async (req, res, next) => {
     return next(new AppError(error?.message || "Invalid Refresh Token", 401));
   }
 });
+
+export const getAllUsers = CatchAsync(async (req, res, next) => {
+  const users = await User.find().select("-password -refreshToken");
+  const role_user = users.filter((user) => user.role === "user");
+  const role_admin = users.filter((user) => user.role === "admin");
+
+  res.status(200).json({
+    status: "success",
+    results: users.length,
+    data: {
+      users: {
+        results: role_user.length,
+        role_user,
+      },
+      admin: {
+        results: role_admin.length,
+        role_admin,
+      },
+    },
+  });
+});
+
+export const deleteUser = CatchAsync(async (req, res, next) => {
+  const user = await User.findByIdAndDelete(req.params.id);
+
+  if (!user) {
+    return next(new AppError("User not found with that id!", 404));
+  }
+
+  res.status(200).json({
+    status: "success",
+    message: "User Deleted Successfully!",
+  });
+});
