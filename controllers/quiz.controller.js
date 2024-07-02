@@ -73,8 +73,13 @@ export const createQuiz = CatchAsync(async (req, res, next) => {
 
 export const getQuiz = CatchAsync(async (req, res, next) => {
   const quiz = await Quiz.findById(req.params.id)
-    .populate("questions")
-    .populate("category");
+    .populate({
+      path: "questions",
+    })
+    .populate({
+      path: "category",
+      select: "name",
+    });
 
   if (!quiz) {
     return next(new AppError("Quiz not found with that id!", 404));
