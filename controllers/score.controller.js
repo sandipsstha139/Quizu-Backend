@@ -32,7 +32,15 @@ export const createScore = CatchAsync(async (req, res, next) => {
 });
 
 export const getScoreById = CatchAsync(async (req, res, next) => {
-  const score = await Score.findById(req.params.id).populate("user quiz");
+  const score = await Score.findById(req.params.id)
+    .populate("user")
+    .populate({
+      path: "quiz",
+      populate: {
+        path: "category",
+        select: "name",
+      },
+    });
 
   if (!score) {
     return next(new AppError("No score found with that id!", 404));
