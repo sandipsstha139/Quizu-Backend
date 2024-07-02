@@ -88,6 +88,7 @@ export const login = CatchAsync(async (req, res, next) => {
       message: "User Logged in Successfully",
       data: {
         loggedInUser,
+        accessToken,
       },
     });
 });

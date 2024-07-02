@@ -16,6 +16,9 @@ export const scoreSchema = new Schema(
       type: Number,
       required: true,
     },
+    correct_score: Number,
+    wrong_score: Number,
+    unattempted: Number,
   },
   { timestamps: true }
 );
