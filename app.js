@@ -22,6 +22,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:3000",
+      "192.168.1.65:3000",
       "*",
       "https://quizu-backend-1.onrender.com",
       "https://quizzu.vercel.app",

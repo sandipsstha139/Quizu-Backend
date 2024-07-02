@@ -16,9 +16,15 @@ export const scoreSchema = new Schema(
       type: Number,
       required: true,
     },
-    correct_score: Number,
-    wrong_score: Number,
-    unattempted: Number,
+    correctAnswers: { type: Number },
+    wrongAnswers: { type: Number },
+    notAnswered: { type: Number },
+    selected_options: [
+      {
+        question: { type: mongoose.Schema.Types.ObjectId, ref: "Question" },
+        option: { type: String },
+      },
+    ],
   },
   { timestamps: true }
 );
