@@ -20,24 +20,26 @@ export const createQuiz = CatchAsync(async (req, res, next) => {
     return next(new AppError("No Category found with that ID", 404));
   }
 
-  // Check if questions is a valid JSON string or an array of valid ObjectId strings
-  let questionsArray;
-  try {
-    questionsArray =
-      typeof questions === "string" ? JSON.parse(questions) : questions;
-  } catch (error) {
-    return next(new AppError("Invalid questions format!", 400));
-  }
+  let questionsArray = [];
+  if (questions) {
+    try {
+      questionsArray =
+        typeof questions === "string" ? JSON.parse(questions) : questions;
+    } catch (error) {
+      return next(new AppError("Invalid questions format!", 400));
+    }
 
-  console.log(questionsArray);
-
-  if (
-    !Array.isArray(questionsArray) ||
-    !questionsArray.every((id) => mongoose.Types.ObjectId.isValid(id))
-  ) {
-    return next(
-      new AppError("Questions must be an array of valid ObjectId strings!", 400)
-    );
+    if (
+      !Array.isArray(questionsArray) ||
+      !questionsArray.every((id) => mongoose.Types.ObjectId.isValid(id))
+    ) {
+      return next(
+        new AppError(
+          "Questions must be an array of valid ObjectId strings!",
+          400
+        )
+      );
+    }
   }
 
   const coverImageLocalPath = req.file?.path;
