@@ -40,6 +40,9 @@ export const getScoreById = CatchAsync(async (req, res, next) => {
         path: "category",
         select: "name",
       },
+      populate: {
+        path: "questions",
+      },
     });
 
   if (!score) {
