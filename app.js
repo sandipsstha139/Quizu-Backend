@@ -28,6 +28,8 @@ app.use(
       "https://quizzu.vercel.app",
       "https://quizzu-git-v1main-pradeep-chhetris-projects.vercel.app",
       "https://quizzu-7wi9i3vc3-pradeep-chhetris-projects.vercel.app",
+      "quizu-dash-board.vercel.app",
+      "quizu-dash-board-hn2k11q4g-sandipssthas-projects.vercel.app",
     ],
     credentials: true,
   })

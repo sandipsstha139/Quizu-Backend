@@ -25,7 +25,6 @@ const quizSchema = new Schema(
     ],
     duration: {
       type: Number,
-      required: true,
     },
   },
   { timestamps: true }

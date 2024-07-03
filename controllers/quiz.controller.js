@@ -97,7 +97,7 @@ export const getQuiz = CatchAsync(async (req, res, next) => {
   });
 });
 export const getAllQuiz = CatchAsync(async (req, res, next) => {
-  const quizs = await Quiz.find().populate("questions");
+  const quizs = await Quiz.find().populate("questions category");
   res.status(200).json({
     status: "Success",
     results: quizs.length,
@@ -118,23 +118,28 @@ export const updateQuiz = CatchAsync(async (req, res, next) => {
   // Check if questions is a valid JSON string or an array of valid ObjectId strings
   let questionsArray;
   if (questions) {
-    try {
-      questionsArray =
-        typeof questions === "string" ? JSON.parse(questions) : questions;
-    } catch (error) {
-      return next(new AppError("Invalid questions format!", 400));
+    if (questions) {
+      try {
+        questionsArray =
+          typeof questions === "string" ? JSON.parse(questions) : questions;
+      } catch (error) {
+        return next(new AppError("Invalid questions format!", 400));
+      }
     }
-  }
 
-  console.log(questionsArray);
+    console.log(questionsArray);
 
-  if (
-    !Array.isArray(questionsArray) ||
-    !questionsArray.every((id) => mongoose.Types.ObjectId.isValid(id))
-  ) {
-    return next(
-      new AppError("Questions must be an array of valid ObjectId strings!", 400)
-    );
+    if (
+      !Array.isArray(questionsArray) ||
+      !questionsArray.every((id) => mongoose.Types.ObjectId.isValid(id))
+    ) {
+      return next(
+        new AppError(
+          "Questions must be an array of valid ObjectId strings!",
+          400
+        )
+      );
+    }
   }
 
   const currentQuiz = await Quiz.findById(req.params.id);
