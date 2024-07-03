@@ -109,9 +109,9 @@ export const getAllQuiz = CatchAsync(async (req, res, next) => {
 });
 
 export const updateQuiz = CatchAsync(async (req, res, next) => {
-  const { title, description, category, questions } = req.body;
+  const { title, description, category, questions, duration } = req.body;
 
-  if (!title || !description || !category) {
+  if (!title || !description || !category || !duration) {
     return next(new AppError("All fields are required!", 400));
   }
 
@@ -168,6 +168,7 @@ export const updateQuiz = CatchAsync(async (req, res, next) => {
       title,
       description,
       category,
+      duration,
       coverImage: coverImageUrl,
       questions: questionsArray,
     },
