@@ -139,6 +139,7 @@ export const register = CatchAsync(async (req, res, next) => {
       message: "User Registerd Successfully",
       data: {
         createdUser,
+        accessToken,
       },
     });
 });

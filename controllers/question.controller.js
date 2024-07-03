@@ -47,7 +47,10 @@ export const createQuestion = CatchAsync(async (req, res, next) => {
 });
 
 export const getAllQuestions = CatchAsync(async (req, res, next) => {
-  const questions = await Question.find();
+  const questions = await Question.find().populate({
+    path: "quiz",
+    populate: "category",
+  });
 
   res.status(200).json({
     status: "Success",
@@ -60,7 +63,10 @@ export const getAllQuestions = CatchAsync(async (req, res, next) => {
 });
 
 export const getQuestion = CatchAsync(async (req, res, next) => {
-  const question = await Question.findById(req.params.id);
+  const question = await Question.findById(req.params.id).populate({
+    path: "quiz",
+    populate: "category",
+  });
 
   if (!question) {
     return next(new AppError("No Question found with that id!", 404));
