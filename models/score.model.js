@@ -25,6 +25,7 @@ export const scoreSchema = new Schema(
         option: { type: String },
       },
     ],
+    timeTaken: { type: Number },
   },
   { timestamps: true }
 );

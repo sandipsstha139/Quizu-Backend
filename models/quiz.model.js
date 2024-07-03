@@ -23,6 +23,10 @@ const quizSchema = new Schema(
         ref: "Question",
       },
     ],
+    duration: {
+      type: Number,
+      required: true,
+    },
   },
   { timestamps: true }
 );

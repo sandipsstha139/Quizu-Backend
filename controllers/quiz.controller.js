@@ -9,9 +9,9 @@ import {
 import Category from "../models/category.model.js";
 
 export const createQuiz = CatchAsync(async (req, res, next) => {
-  const { title, description, category, questions } = req.body;
+  const { title, description, category, questions, duration } = req.body;
 
-  if (!title || !description || !category) {
+  if (!title || !description || !category || !duration) {
     return next(new AppError("All fields are required!", 400));
   }
 
@@ -59,6 +59,7 @@ export const createQuiz = CatchAsync(async (req, res, next) => {
     category,
     coverImage: coverImage.url,
     questions: questionsArray,
+    duration,
   });
 
   existingCategory.quizzes.push(quiz._id);

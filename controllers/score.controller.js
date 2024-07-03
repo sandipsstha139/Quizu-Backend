@@ -40,6 +40,7 @@ export const createScore = CatchAsync(async (req, res, next) => {
     correctAnswers,
     wrongAnswers,
     notAnswered,
+    timeTaken,
   } = req.body;
 
   try {
@@ -88,6 +89,7 @@ export const createScore = CatchAsync(async (req, res, next) => {
       correctAnswers,
       wrongAnswers,
       notAnswered,
+      timeTaken,
       selected_options: selectedOptions.map((option) => ({
         question: option.questionId,
         option: option.selectedOption,
