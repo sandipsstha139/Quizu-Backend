@@ -18,19 +18,25 @@ const app = express();
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(urlencoded({ extended: true }));
+// app.use(
+//   cors({
+//     origin: [
+//       "http://localhost:3000",
+//       "192.168.1.65:3000",
+//       "*",
+//       "https://quizu-backend-1.onrender.com",
+//       "https://quizzu.vercel.app",
+//       "https://quizzu-git-v1main-pradeep-chhetris-projects.vercel.app",
+//       "https://quizzu-7wi9i3vc3-pradeep-chhetris-projects.vercel.app",
+//       "https://quizu-dash-board.vercel.app",
+//       "https://quizu-dash-board-hn2k11q4g-sandipssthas-projects.vercel.app",
+//     ],
+//     credentials: true,
+//   })
+// );
 app.use(
   cors({
-    origin: [
-      "http://localhost:3000",
-      "192.168.1.65:3000",
-      "*",
-      "https://quizu-backend-1.onrender.com",
-      "https://quizzu.vercel.app",
-      "https://quizzu-git-v1main-pradeep-chhetris-projects.vercel.app",
-      "https://quizzu-7wi9i3vc3-pradeep-chhetris-projects.vercel.app",
-      "quizu-dash-board.vercel.app",
-      "quizu-dash-board-hn2k11q4g-sandipssthas-projects.vercel.app",
-    ],
+    origin: true,
     credentials: true,
   })
 );
