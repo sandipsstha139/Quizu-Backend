@@ -89,6 +89,7 @@ export const login = CatchAsync(async (req, res, next) => {
       data: {
         loggedInUser,
         accessToken,
+        refreshToken,
       },
     });
 });
@@ -140,6 +141,7 @@ export const register = CatchAsync(async (req, res, next) => {
       data: {
         createdUser,
         accessToken,
+        refreshToken,
       },
     });
 });
@@ -415,7 +417,7 @@ export const refreshAccessToken = CatchAsync(async (req, res, next) => {
   }
 
   try {
-    const decodedToken = await jwt.verify(
+    const decodedToken = jwt.verify(
       incomingRefreshToken,
       process.env.REFRESH_TOKEN_SECRET
     );
