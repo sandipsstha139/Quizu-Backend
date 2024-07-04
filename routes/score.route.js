@@ -5,6 +5,7 @@ import {
   deleteScore,
   getAllScore,
   getScoreById,
+  getScoreByUser,
   updateScore,
 } from "../controllers/score.controller.js";
 
@@ -17,5 +18,7 @@ router
   .get(getScoreById)
   .patch(verifyJWT, updateScore)
   .delete(verifyJWT, deleteScore);
+
+router.route("/profile/:userId").get(verifyJWT, getScoreByUser);
 
 export default router;

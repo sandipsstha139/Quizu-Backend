@@ -132,7 +132,7 @@ export const getScoreById = CatchAsync(async (req, res, next) => {
   });
 });
 export const getAllScore = CatchAsync(async (req, res, next) => {
-  const scores = await Score.find();
+  const scores = await Score.find().sort("-createdAt");
   // .populate({
   //   path: "user",
   //   select: "fullname",
@@ -179,5 +179,25 @@ export const deleteScore = CatchAsync(async (req, res, next) => {
   res.status(200).json({
     status: "Success",
     message: "Score Deleted Successfully",
+  });
+});
+
+export const getScoreByUser = CatchAsync(async (req, res, next) => {
+  console.log(req.params.userId);
+  const scores = await Score.find({ user: req.params.userId }).sort(
+    "-createdAt"
+  );
+
+  if (!scores) {
+    return next(new AppError("No score found with that id!", 404));
+  }
+
+  res.status(200).json({
+    status: "Success",
+    results: scores.length,
+    message: "Score fetched Successfully",
+    data: {
+      scores,
+    },
   });
 });
