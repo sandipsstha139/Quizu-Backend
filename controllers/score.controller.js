@@ -184,9 +184,7 @@ export const deleteScore = CatchAsync(async (req, res, next) => {
 
 export const getScoreByUser = CatchAsync(async (req, res, next) => {
   console.log(req.params.userId);
-  const scores = await Score.find({ user: req.params.userId }).sort(
-    "-createdAt"
-  );
+  const scores = await Score.find({ user: req.params.userId });
 
   if (!scores) {
     return next(new AppError("No score found with that id!", 404));
