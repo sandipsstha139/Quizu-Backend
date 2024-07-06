@@ -11,7 +11,6 @@ import quizRoute from "./routes/quiz.route.js";
 import scoreRoute from "./routes/score.route.js";
 import categoryRoute from "./routes/category.route.js";
 import globalErrorHandler from "./controllers/error.controller.js";
-
 const app = express();
 
 // Middlewares

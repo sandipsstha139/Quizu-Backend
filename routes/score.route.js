@@ -3,6 +3,7 @@ import { verifyJWT } from "../middleware/auth.middleware.js";
 import {
   createScore,
   deleteScore,
+  fetchTopThreeScorers,
   getAllScore,
   getScoreById,
   getScoreByUser,
@@ -20,5 +21,6 @@ router
   .delete(verifyJWT, deleteScore);
 
 router.route("/profile/:userId").get(verifyJWT, getScoreByUser);
+router.get("/top/three", verifyJWT, fetchTopThreeScorers);
 
 export default router;

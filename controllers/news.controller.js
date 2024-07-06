@@ -39,7 +39,12 @@ export const createNews = CatchAsync(async (req, res, next) => {
 });
 
 export const getAllNews = CatchAsync(async (req, res, next) => {
-  const news = await News.find();
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const skip = (page - 1) * limit;
+
+  const news = await News.find().skip(skip).limit(limit);
+
   res.status(200).json({
     status: "success",
     results: news.length,

@@ -5,32 +5,6 @@ import { User } from "../models/user.model.js";
 import AppError from "../utils/AppError.js";
 import { CatchAsync } from "../utils/catchAsync.js";
 
-// export const createScore = CatchAsync(async (req, res, next) => {
-//   const user = await User.findById(req.body.user);
-
-//   if (!user) {
-//     return next(new AppError("No User with that ID!", 404));
-//   }
-//   const quiz = await Quiz.findById(req.body.quiz);
-
-//   if (!quiz) {
-//     return next(new AppError("No Quiz with that ID!", 404));
-//   }
-
-//   const score = await Score.create(req.body);
-
-//   user.score.push(score._id);
-//   await user.save();
-
-//   res.status(200).json({
-//     status: "Success",
-//     message: "Score Created Successfully",
-//     data: {
-//       score,
-//     },
-//   });
-// });
-
 export const createScore = CatchAsync(async (req, res, next) => {
   const {
     user: userId,
@@ -133,13 +107,6 @@ export const getScoreById = CatchAsync(async (req, res, next) => {
 });
 export const getAllScore = CatchAsync(async (req, res, next) => {
   const scores = await Score.find().sort("-createdAt");
-  // .populate({
-  //   path: "user",
-  //   select: "fullname",
-  // })
-  // .populate({
-  //   path: "quiz",
-  // });
 
   if (!scores) {
     return next(new AppError("No score found with that id!", 404));
@@ -199,3 +166,63 @@ export const getScoreByUser = CatchAsync(async (req, res, next) => {
     },
   });
 });
+
+export const fetchTopThreeScorers = async (req, res, next) => {
+  const topScores = await Score.aggregate([
+    {
+      $group: {
+        _id: "$user",
+        totalScore: { $sum: "$score" },
+        totalQuestions: {
+          $sum: {
+            $add: ["$correctAnswers", "$wrongAnswers", "$notAnswered"],
+          },
+        },
+        correctAnswers: { $sum: "$correctAnswers" },
+      },
+    },
+    {
+      $addFields: {
+        accuracy: {
+          $cond: {
+            if: { $eq: ["$totalQuestions", 0] },
+            then: 0,
+            else: { $divide: ["$correctAnswers", "$totalQuestions"] },
+          },
+        },
+      },
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "_id",
+        foreignField: "_id",
+        as: "user",
+      },
+    },
+    {
+      $unwind: "$user",
+    },
+    {
+      $sort: { totalScore: -1, accuracy: -1 },
+    },
+    {
+      $limit: 3,
+    },
+  ]);
+
+  console.log(topScores);
+
+  if (!topScores || topScores.length === 0) {
+    return next(new AppError("No top scorers found!", 404));
+  }
+
+  res.status(200).json({
+    status: "Success",
+    results: topScores.length,
+    message: "Top scorers fetched successfully",
+    data: {
+      topScores,
+    },
+  });
+};

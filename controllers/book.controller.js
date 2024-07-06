@@ -42,13 +42,22 @@ export const createBook = CatchAsync(async (req, res, next) => {
 });
 
 export const getAllBooks = CatchAsync(async (req, res, next) => {
-  const books = await Book.find();
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const skip = (page - 1) * limit;
+
+  const books = await Book.find().skip(skip).limit(limit);
+
+  const totalBooks = await Book.countDocuments();
+
   res.status(200).json({
     status: "success",
     results: books.length,
     message: "Books Fetched Successfully",
     data: {
       books,
+      currentPage: page,
+      totalPages: Math.ceil(totalBooks / limit),
     },
   });
 });
