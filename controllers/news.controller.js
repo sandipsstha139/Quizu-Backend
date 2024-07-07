@@ -45,12 +45,16 @@ export const getAllNews = CatchAsync(async (req, res, next) => {
 
   const news = await News.find().skip(skip).limit(limit).sort("-createdAt");
 
+  const totalNews = await News.countDocuments();
+
   res.status(200).json({
     status: "success",
     results: news.length,
     message: "News Fetched Successfully",
     data: {
       news,
+      currentPage: page,
+      totalPages: Math.ceil(totalNews / limit),
     },
   });
 });
