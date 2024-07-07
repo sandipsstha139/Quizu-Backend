@@ -43,7 +43,7 @@ export const getAllNews = CatchAsync(async (req, res, next) => {
   const limit = parseInt(req.query.limit) || 10;
   const skip = (page - 1) * limit;
 
-  const news = await News.find().skip(skip).limit(limit);
+  const news = await News.find().skip(skip).limit(limit).sort("-createdAt");
 
   res.status(200).json({
     status: "success",

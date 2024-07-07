@@ -46,7 +46,7 @@ export const getAllBooks = CatchAsync(async (req, res, next) => {
   const limit = parseInt(req.query.limit) || 10;
   const skip = (page - 1) * limit;
 
-  const books = await Book.find().skip(skip).limit(limit);
+  const books = await Book.find().skip(skip).limit(limit).sort("-createdAt");
 
   const totalBooks = await Book.countDocuments();
 

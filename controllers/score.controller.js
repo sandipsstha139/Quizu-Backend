@@ -106,7 +106,10 @@ export const getScoreById = CatchAsync(async (req, res, next) => {
   });
 });
 export const getAllScore = CatchAsync(async (req, res, next) => {
-  const scores = await Score.find().sort("-createdAt").populate("user quiz");
+  const scores = await Score.find()
+    .sort("-createdAt")
+    .populate("user")
+    .populate({ path: "quiz", populate: "category" });
 
   if (!scores) {
     return next(new AppError("No score found with that id!", 404));
