@@ -87,13 +87,6 @@ export const deleteCategory = CatchAsync(async (req, res, next) => {
     return next(new AppError("Category not found with that ID!", 404));
   }
 
-  if (category.quizzes.length > 0) {
-    await Quiz.updateMany(
-      { _id: { $in: category.quizzes } },
-      { $pull: { categories: req.params.id } }
-    );
-  }
-
   res.status(200).json({
     status: "Success",
     message: "Category deleted Successfully",
