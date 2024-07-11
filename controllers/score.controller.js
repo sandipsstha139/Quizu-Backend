@@ -69,6 +69,8 @@ export const getScoreById = CatchAsync(async (req, res, next) => {
     populate: "category questions",
   });
 
+  console.log(score);
+
   if (!score) {
     return next(new AppError("No score found with that id!", 404));
   }
@@ -129,7 +131,10 @@ export const deleteScore = CatchAsync(async (req, res, next) => {
 
 export const getScoreByUser = CatchAsync(async (req, res, next) => {
   console.log(req.params.userId);
-  const scores = await Score.find({ user: req.params.userId });
+  const scores = await Score.find({ user: req.params.userId }).populate({
+    path: "quiz",
+    populate: "category",
+  });
 
   if (!scores) {
     return next(new AppError("No score found with that id!", 404));
