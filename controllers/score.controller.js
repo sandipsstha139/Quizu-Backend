@@ -30,31 +30,6 @@ export const createScore = CatchAsync(async (req, res, next) => {
       return next(new AppError("No Quiz with that ID!", 404));
     }
 
-    // Calculate scores based on selected options
-    let correctAnswers = 0;
-    let wrongAnswers = 0;
-    let notAnswered = 0;
-
-    selectedOptions.forEach((option) => {
-      const question = quiz.questions.find(
-        (q) => q._id.toString() === option.questionId
-      );
-      if (!question) {
-        notAnswered += 1; // Count as not answered if the question is not found
-      } else if (option.selectedOption && option.selectedOption !== "") {
-        if (question.correct_option === option.selectedOption) {
-          correctAnswers += 1;
-        } else {
-          wrongAnswers += 1;
-        }
-      } else {
-        notAnswered += 1; // Count as not answered if no option selected
-      }
-    });
-
-    // Calculate total score
-    const totalScore = correctAnswers;
-
     // Create score document
     const score = await Score.create({
       user: userId,
