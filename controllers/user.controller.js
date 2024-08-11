@@ -45,21 +45,45 @@ export const login = CatchAsync(async (req, res, next) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return next(new AppError("Please fill the form Completely!", 400));
+    return next(new AppError("Please fill the form completely!", 400));
   }
 
   const existingUser = await User.findOne({ email }).select("+password");
-  // console.log(existingUser);
 
   if (!existingUser) {
-    return next(new AppError("User does not exists!", 404));
+    return next(new AppError("User does not exist!", 404));
+  }
+
+  if (existingUser.failedAttempts >= 10) {
+    const timeSinceLastAttempt =
+      Date.now() - new Date(existingUser.lastFailedAttempt).getTime();
+    if (timeSinceLastAttempt < 3600000) {
+      // 1 hour = 3600000 ms
+      return next(
+        new AppError(
+          "Too many failed attempts. Please try again in 1 hour.",
+          403
+        )
+      );
+    } else {
+      existingUser.failedAttempts = 0;
+      existingUser.lastFailedAttempt = null;
+    }
   }
 
   const isPasswordCorrect = await existingUser.isPasswordCorrect(password);
 
   if (!isPasswordCorrect) {
+    existingUser.failedAttempts += 1;
+    existingUser.lastFailedAttempt = Date.now();
+    await existingUser.save();
+
     return next(new AppError("Invalid Credentials!", 400));
   }
+
+  existingUser.failedAttempts = 0;
+  existingUser.lastFailedAttempt = null;
+  await existingUser.save();
 
   const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(
     existingUser._id
@@ -82,7 +106,7 @@ export const login = CatchAsync(async (req, res, next) => {
     .cookie("refreshToken", refreshToken, options)
     .json({
       status: "success",
-      message: "User Logged in Successfully",
+      message: "User logged in successfully",
       data: {
         loggedInUser,
         accessToken,

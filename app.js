@@ -20,6 +20,12 @@ import globalErrorHandler from "./controllers/error.controller.js";
 
 const app = express();
 
+app.use(
+  cors({
+    origin: true,
+    credentials: true,
+  })
+);
 // Data sanitization against NoSQL query injection
 app.use(mongoSanitize());
 
@@ -28,12 +34,12 @@ app.use(helmet());
 
 // Define rate limiter
 const limiter = rateLimit({
-  max: 10,
+  max: 15,
   windowMs: 60 * 1000,
   statusCode: 429,
   handler: (req, res, next, options) => {
     res.status(options.statusCode).json({
-      status: "fail",
+      status: 429,
       message:
         "Too many requests from this IP, please try again after 1 minute!",
     });
@@ -65,12 +71,7 @@ app.use(
 app.use(morgan("dev"));
 app.use(express.json({ limit: "10kb" }));
 app.use(urlencoded({ extended: true }));
-app.use(
-  cors({
-    origin: true,
-    credentials: true,
-  })
-);
+
 app.use(cookieParser());
 
 // Routes

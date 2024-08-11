@@ -54,8 +54,17 @@ const userSchema = new Schema(
     passwordResetOTP: {
       type: String,
     },
+
     passwordResetExpires: String,
+    failedAttempts: {
+      type: Number,
+      default: 0,
+    },
+    lastFailedAttempt: {
+      type: Date,
+    },
   },
+
   {
     timestamps: true,
   }
