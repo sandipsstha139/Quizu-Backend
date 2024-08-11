@@ -3,6 +3,12 @@ import morgan from "morgan";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 
+import rateLimit from "express-rate-limit";
+import helmet from "helmet";
+import mongoSanitize from "express-mongo-sanitize";
+import xss from "xss-clean";
+import hpp from "hpp";
+
 import userRoute from "./routes/user.route.js";
 import newsRoute from "./routes/news.route.js";
 import bookRoute from "./routes/book.route.js";
@@ -11,28 +17,54 @@ import quizRoute from "./routes/quiz.route.js";
 import scoreRoute from "./routes/score.route.js";
 import categoryRoute from "./routes/category.route.js";
 import globalErrorHandler from "./controllers/error.controller.js";
+
 const app = express();
+
+// Data sanitization against NoSQL query injection
+app.use(mongoSanitize());
+
+// Set security HTTP headers
+app.use(helmet());
+
+// Define rate limiter
+const limiter = rateLimit({
+  max: 10,
+  windowMs: 60 * 1000,
+  statusCode: 429,
+  handler: (req, res, next, options) => {
+    res.status(options.statusCode).json({
+      status: "fail",
+      message:
+        "Too many requests from this IP, please try again after 1 minute!",
+    });
+  },
+});
+
+app.use("/api", limiter);
+
+// Data sanitization against XSS
+app.use(xss());
+
+// Prevent parameter pollution
+app.use(
+  hpp({
+    whitelist: [
+      "name",
+      "email",
+      "password",
+      "passwordConfirm",
+      "role",
+      "photo",
+      "phone",
+      "address",
+    ],
+  })
+);
 
 // Middlewares
 app.use(morgan("dev"));
-app.use(express.json());
+app.use(express.json({ limit: "10kb" }));
 app.use(urlencoded({ extended: true }));
-// app.use(
-//   cors({
-//     origin: [
-//       "http://localhost:3000",
-//       "192.168.1.65:3000",
-//       "*",
-//       "https://quizu-backend-1.onrender.com",
-//       "https://quizzu.vercel.app",
-//       "https://quizzu-git-v1main-pradeep-chhetris-projects.vercel.app",
-//       "https://quizzu-7wi9i3vc3-pradeep-chhetris-projects.vercel.app",
-//       "https://quizu-dash-board.vercel.app",
-//       "https://quizu-dash-board-hn2k11q4g-sandipssthas-projects.vercel.app",
-//     ],
-//     credentials: true,
-//   })
-// );
 app.use(
   cors({
     origin: true,

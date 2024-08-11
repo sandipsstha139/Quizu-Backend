@@ -48,17 +48,14 @@ export const login = CatchAsync(async (req, res, next) => {
     return next(new AppError("Please fill the form Completely!", 400));
   }
 
-  const existingUser = await User.findOne({ email });
+  const existingUser = await User.findOne({ email }).select("+password");
+  // console.log(existingUser);
 
   if (!existingUser) {
     return next(new AppError("User does not exists!", 404));
   }
 
   const isPasswordCorrect = await existingUser.isPasswordCorrect(password);
-
-  console.log(password);
-
-  console.log(isPasswordCorrect);
 
   if (!isPasswordCorrect) {
     return next(new AppError("Invalid Credentials!", 400));
