@@ -2,7 +2,7 @@ import mongoose, { Schema } from "mongoose";
 import jwt from "jsonwebtoken";
 import bcryptjs from "bcryptjs";
 import { scoreSchema } from "./score.model.js";
-import validator from "validator";
+import validator, { isStrongPassword } from "validator";
 
 const userSchema = new Schema(
   {
@@ -42,6 +42,7 @@ const userSchema = new Schema(
       required: [true, "Password is required"],
       minLength: [8, "Password must be atleast 8 characters long"],
       select: false,
+      isStrongPassword: [true, "Password must be strong"],
     },
     refreshToken: {
       type: String,
