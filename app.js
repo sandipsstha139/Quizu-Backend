@@ -34,7 +34,7 @@ app.use(helmet());
 
 // Define rate limiter
 const limiter = rateLimit({
-  max: 15,
+  max: 20,
   windowMs: 60 * 1000,
   statusCode: 429,
   handler: (req, res, next, options) => {

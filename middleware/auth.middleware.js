@@ -24,6 +24,16 @@ export const verifyJWT = CatchAsync(async (req, res, next) => {
     }
 
     req.user = user;
+
+    const passwordAgeInDays =
+      (Date.now() - new Date(user.lastPasswordChange).getTime()) /
+      (1000 * 60 * 60 * 24);
+
+    if (passwordAgeInDays > 90) {
+      return res
+        .status(403)
+        .json({ message: "Password has expired, please reset your password." });
+    }
     next();
   } catch (error) {
     return next(new AppError(error?.message || "Invalid access token", 401));

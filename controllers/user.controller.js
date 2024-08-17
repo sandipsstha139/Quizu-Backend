@@ -118,6 +118,62 @@ export const login = CatchAsync(async (req, res, next) => {
 export const register = CatchAsync(async (req, res, next) => {
   const { fullname, email, password, role } = req.body;
 
+  // console.log(req.body);
+
+  if (
+    !email ||
+    !password ||
+    !fullname ||
+    email === "" ||
+    password === "" ||
+    fullname === ""
+  ) {
+    return next(new AppError("Please fill the form Completely!", 400));
+  }
+
+  const existingUser = await User.findOne({ email });
+
+  if (existingUser) {
+    return next(new AppError("User Already Exists!", 400));
+  }
+
+  const user = await User.create({ fullname, email, password, role });
+
+  const createdUser = await User.findById(user._id).select(
+    "-password -refreshToken"
+  );
+
+  const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(
+    user._id
+  );
+
+  const options = {
+    httpOnly: true,
+    secure: true,
+    overwrite: true,
+    sameSite: "none",
+  };
+
+  res
+    .status(200)
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options)
+    .json({
+      status: "success",
+      message: "User Registerd Successfully",
+      data: {
+        createdUser,
+        accessToken,
+        refreshToken,
+      },
+    });
+});
+
+export const createAdmin = CatchAsync(async (req, res, next) => {
+  const { fullname, email, password, role } = req.body;
+
+  console.log(req.body);
+
   if (
     !email ||
     !password ||
@@ -266,6 +322,7 @@ export const resetPassword = async (req, res, next) => {
   }
 
   user.password = newPassword;
+  user.lastPasswordChange = Date.now();
   await user.save();
 
   const options = {
@@ -395,6 +452,7 @@ export const changePassword = CatchAsync(async (req, res, next) => {
   }
 
   user.password = password;
+  user.lastPasswordChange = Date.now();
   await user.save({ validateBeforeSave: false });
 
   res.status(200).json({

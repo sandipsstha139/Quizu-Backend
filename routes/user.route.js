@@ -1,6 +1,7 @@
 import express from "express";
 import {
   changePassword,
+  createAdmin,
   deleteUser,
   forgetPassword,
   getAllUsers,
@@ -24,6 +25,7 @@ router.route("/refresh-token").post(refreshAccessToken);
 
 router.route("/login").post(login);
 router.route("/register").post(register);
+router.route("/create-admin").post(verifyJWT, restrictTo("admin"), createAdmin);
 router.route("/logout").get(verifyJWT, logout);
 router.route("/me").get(verifyJWT, getMe);
 
